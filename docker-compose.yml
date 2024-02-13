@@ -1,15 +1,17 @@
 version: "3"
 
-volumes:
-  redis:
+networks:
+  default:
+    external:
+      name: devocmysqlnet
 
 services:
   redis:
-    image: "example/redis:v7.0.4"
-    command: ["/app/docker-redis-entrypoint.sh"]
-    container_name: redis
+    build:
+      context: ./redis
+    command: ["redis-server", "--tls-port", "6379", "--port", "0", "--tls-cert-file", "/tls/redis.crt", "--tls-key-file", "/tls/redis.key", "--tls-ca-cert-file", "/tls/ca.crt", "--tls-auth-clients", "no"]
+    container_name: ${REDIS_NAME}
     ports:
       - 6379:6379
     volumes:
-      - redis:/data
-      - ./:/app
+      - ./data:/data
